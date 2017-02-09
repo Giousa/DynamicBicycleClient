@@ -38,3 +38,10 @@ dependencies {
     compile 'com.android.support:appcompat-v7:25.0.1'
     testCompile 'junit:junit:4.12'
 }
+
+task protoFactory(type: JavaExec ) {
+    classpath = files("libs/wire-compiler-2.2.0-jar-with-dependencies.jar")
+    args = ["--proto_path=src/main/proto", "--java_out=src/main/java",
+            "device.proto"]
+    main = "com.squareup.wire.WireCompiler"
+}

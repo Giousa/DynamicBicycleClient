@@ -1,0 +1,12 @@
+option java_package = "com.km1930.dynamicbicycleclient.model";
+
+option java_outer_classname = "IntelDevicePB";
+
+message IntelDevice{
+
+    required string deviceId = 1;
+
+    optional int32 speed = 2;
+
+    optional int32 angle = 3;
+}

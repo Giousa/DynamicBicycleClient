@@ -30,11 +30,11 @@ public class SerialManager {
     }
 
     public interface SerialSpeedChangeListener {
-        void onSerialSpeedChanged(short speed);
+        void onSerialSpeedChanged(int speed);
     }
 
     public interface SerialAngleChangeListener {
-        void onSerialAngleChanged(float angle);
+        void onSerialAngleChanged(int angle);
     }
 
     private SerialSpeedChangeListener mSerialSpeedChangeListener;
@@ -90,13 +90,13 @@ public class SerialManager {
         }
     }
 
-    private short mSpeed = 0;
-    private float mAngle = 15;
+    private int mSpeed = 0;
+    private int mAngle = 15;
 
     private void parseSerialData(short[] mShorts) {
 
-        short speed = mShorts[2];
-        speed = (short) ((Math.round(speed*100))/100);
+        int speed = mShorts[2];
+        speed = (Math.round(speed*100))/100;
         Log.d(TAG,"serialmanager speed="+speed);
 
         if (mSpeed != speed) {
@@ -106,7 +106,7 @@ public class SerialManager {
             }
         }
 
-        float angle = mShorts[3];
+        int angle = mShorts[3];
         if(mAngle != angle){
             mAngle = angle;
             if(mSerialAngleChangeListener != null){

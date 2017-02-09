@@ -1,4 +1,4 @@
-package com.km1930.dynamicbicycleclient;
+package com.km1930.dynamicbicycleclient.client;
 
 
 import com.km1930.dynamicbicycleclient.common.CustomHeartbeatHandler;

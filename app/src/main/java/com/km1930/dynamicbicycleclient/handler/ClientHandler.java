@@ -1,6 +1,6 @@
 package com.km1930.dynamicbicycleclient.handler;
 
-import com.km1930.dynamicbicycleclient.Client;
+import com.km1930.dynamicbicycleclient.client.Client;
 import com.km1930.dynamicbicycleclient.common.CustomHeartbeatHandler;
 
 import io.netty.buffer.ByteBuf;
