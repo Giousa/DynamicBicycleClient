@@ -11,6 +11,7 @@ android {
         versionName "1.0"
         ndk{
             moduleName "Serial"
+            ldLibs "log"
             abiFilters "armeabi","armeabi-v7a","x86"
         }
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
@@ -19,6 +20,12 @@ android {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+
+    sourceSets {
+        main {
+            jniLibs.srcDirs = ['libs']
         }
     }
 }
