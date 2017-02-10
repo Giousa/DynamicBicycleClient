@@ -1,12 +1,9 @@
 package com.km1930.dynamicbicycleclient.test;
 
-import android.util.Log;
-
 import com.km1930.dynamicbicycleclient.client.Client;
-import com.km1930.dynamicbicycleclient.model.IntelDevice;
+import com.km1930.dynamicbicycleclient.model.DeviceValue;
+import com.km1930.dynamicbicycleclient.model.TypeData;
 
-import java.io.IOException;
-import java.util.Arrays;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -21,8 +18,8 @@ public class ClientTest {
     private static Timer mTimer = null;
     private static TimerTask mTimerTask = null;
     private static boolean isPause = false;
-    private static int delay = 5000;
-    private static int period = 5000;
+    private static int delay = 100;
+    private static int period = 100;
     private static Client mClient;
 
     public static void main(String[] args) {
@@ -59,21 +56,13 @@ public class ClientTest {
 
     private static int speed = 0;
     private static void sendToServer(){
-        if(speed > 1000){
-            speed = 0;
-        }
-        byte[] bytes = new IntelDevice.Builder().deviceId("UT01").speed(speed++).build().encode();
-        System.out.println("bytes speed="+ Arrays.toString(bytes));
+        DeviceValue s = new DeviceValue();
+        s.setType(TypeData.CUSTOME);
+        s.setSpeed(speed++);
+        s.setAngle(15);
+        s.setDeviceName("UT01");
         try {
-            IntelDevice intelDevice = IntelDevice.ADAPTER.decode(bytes);
-            System.out.println("IntelDevice:"+intelDevice);
-            System.out.println("IntelDevice  deviceId:"+intelDevice.deviceId);
-            System.out.println("IntelDevice  speed:"+intelDevice.speed);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        try {
-            mClient.sendData(Arrays.toString(bytes));
+            mClient.sendData(s);
         } catch (Exception e) {
             e.printStackTrace();
         }

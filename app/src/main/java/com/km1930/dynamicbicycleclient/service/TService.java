@@ -9,7 +9,6 @@ import android.support.annotation.Nullable;
 import android.util.Log;
 
 import com.km1930.dynamicbicycleclient.client.Client;
-import com.km1930.dynamicbicycleclient.model.IntelDevice;
 import com.km1930.dynamicbicycleclient.serialndk.SerialManager;
 import com.km1930.dynamicbicycleclient.utils.SharedPreferencesUtil;
 import com.km1930.dynamicbicycleclient.utils.UIUtils;
@@ -18,7 +17,6 @@ import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.SocketException;
-import java.util.Arrays;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -224,21 +222,7 @@ public class TService extends Service implements SerialManager.SerialSpeedChange
         if(speed > 1000){
             speed = 0;
         }
-        byte[] bytes = new IntelDevice.Builder().deviceId(mDeviceId).speed(speed++).build().encode();
-        System.out.println("bytes speed="+ Arrays.toString(bytes));
-        try {
-            IntelDevice intelDevice = IntelDevice.ADAPTER.decode(bytes);
-            System.out.println("IntelDevice:"+intelDevice);
-            System.out.println("IntelDevice  deviceId:"+intelDevice.deviceId);
-            System.out.println("IntelDevice  speed:"+intelDevice.speed);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        try {
-            mClient.sendData(Arrays.toString(bytes));
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+//        mClient.sendData(Arrays.toString(bytes));
     }
 
     private void stopTimer(){
@@ -269,9 +253,6 @@ public class TService extends Service implements SerialManager.SerialSpeedChange
     @Override
     public void onSerialSpeedChanged(int speed) {
         Log.d(TAG, "onSerialSpeedChanged：" + speed);
-        byte[] bytes = new IntelDevice.Builder().deviceId(mDeviceId).speed(speed).build().encode();
-        System.out.println("bytes speed="+ Arrays.toString(bytes));
-//        mClient.sendData(bytes);
 
     }
 

@@ -1,13 +1,13 @@
 package com.km1930.dynamicbicycleclient.client;
 
-
-import com.km1930.dynamicbicycleclient.common.CustomHeartbeatHandler;
+import com.km1930.dynamicbicycleclient.code.MsgPackDecode;
+import com.km1930.dynamicbicycleclient.code.MsgPackEncode;
 import com.km1930.dynamicbicycleclient.handler.ClientHandler;
+import com.km1930.dynamicbicycleclient.model.DeviceValue;
 
 import java.util.concurrent.TimeUnit;
 
 import io.netty.bootstrap.Bootstrap;
-import io.netty.buffer.ByteBuf;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelFutureListener;
@@ -16,7 +16,6 @@ import io.netty.channel.ChannelPipeline;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
-import io.netty.handler.codec.LengthFieldBasedFrameDecoder;
 import io.netty.handler.timeout.IdleStateHandler;
 
 /**
@@ -35,13 +34,10 @@ public class Client {
         this.hostIp = hostIp;
     }
 
-    public void sendData(String trim) throws Exception {
+    public void sendData(DeviceValue deviceValue) throws Exception {
         if (channel != null && channel.isActive()) {
-            ByteBuf buf = channel.alloc().buffer(5 + trim.getBytes().length);
-            buf.writeInt(5 + trim.getBytes().length);
-            buf.writeByte(CustomHeartbeatHandler.CUSTOM_MSG);
-            buf.writeBytes(trim.getBytes());
-            channel.writeAndFlush(buf);
+
+            channel.writeAndFlush(deviceValue);
         }
     }
 
@@ -55,7 +51,8 @@ public class Client {
                         protected void initChannel(SocketChannel socketChannel) throws Exception {
                             ChannelPipeline p = socketChannel.pipeline();
                             p.addLast(new IdleStateHandler(0, 0, 5));
-                            p.addLast(new LengthFieldBasedFrameDecoder(1024, 0, 4, -4, 0));
+                            p.addLast(new MsgPackDecode());
+                            p.addLast(new MsgPackEncode());
                             p.addLast(new ClientHandler(Client.this));
                         }
                     });

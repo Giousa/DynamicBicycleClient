@@ -1,8 +1,12 @@
 package com.km1930.dynamicbicycleclient.common;
 
-import io.netty.buffer.ByteBuf;
+import com.km1930.dynamicbicycleclient.model.DeviceValue;
+import com.km1930.dynamicbicycleclient.model.TypeData;
+
+import java.util.List;
+
 import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.SimpleChannelInboundHandler;
+import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.handler.timeout.IdleStateEvent;
 
 /**
@@ -11,10 +15,8 @@ import io.netty.handler.timeout.IdleStateEvent;
  * Date:2017/2/9
  * Email:65489469@qq.com
  */
-public abstract class CustomHeartbeatHandler extends SimpleChannelInboundHandler<ByteBuf> {
-    public static final byte PING_MSG = 1;
-    public static final byte PONG_MSG = 2;
-    public static final byte CUSTOM_MSG = 3;
+public abstract class CustomHeartbeatHandler extends ChannelInboundHandlerAdapter {
+
     protected String name;
     private int heartbeatCount = 0;
 
@@ -23,36 +25,42 @@ public abstract class CustomHeartbeatHandler extends SimpleChannelInboundHandler
     }
 
     @Override
-    protected void channelRead0(ChannelHandlerContext context, ByteBuf byteBuf) throws Exception {
-        if (byteBuf.getByte(4) == PING_MSG) {
-            sendPongMsg(context);
-        } else if (byteBuf.getByte(4) == PONG_MSG){
-            System.out.println(name + " get pong msg from " + context.channel().remoteAddress());
+    public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
+        List<DeviceValue> s = (List<DeviceValue>) msg;
+        System.out.println("type="+s.get(0));
+        if ("1".equals(s.get(0))) {
+            sendPongMsg(ctx);
+        } else if ("2".equals(s.get(0))){
+            System.out.println(name + " get pong msg from " + ctx.channel().remoteAddress());
         } else {
-            handleData(context, byteBuf);
+            handleData(ctx, msg);
         }
     }
 
+
     protected void sendPingMsg(ChannelHandlerContext context) {
-        ByteBuf buf = context.alloc().buffer(5);
-        buf.writeInt(5);
-        buf.writeByte(PING_MSG);
-        buf.retain();
-        context.writeAndFlush(buf);
+        DeviceValue s = new DeviceValue();
+        s.setType(TypeData.PING);
+        s.setSpeed(0);
+        s.setAngle(15);
+        s.setDeviceName("ping");
+        context.channel().writeAndFlush(s);
         heartbeatCount++;
         System.out.println(name + " sent ping msg to " + context.channel().remoteAddress() + ", count: " + heartbeatCount);
     }
 
     private void sendPongMsg(ChannelHandlerContext context) {
-        ByteBuf buf = context.alloc().buffer(5);
-        buf.writeInt(5);
-        buf.writeByte(PONG_MSG);
-        context.channel().writeAndFlush(buf);
+        DeviceValue s = new DeviceValue();
+        s.setType(TypeData.PONG);
+        s.setSpeed(0);
+        s.setAngle(15);
+        s.setDeviceName("pong");
+        context.channel().writeAndFlush(s);
         heartbeatCount++;
         System.out.println(name + " sent pong msg to " + context.channel().remoteAddress() + ", count: " + heartbeatCount);
     }
 
-    protected abstract void handleData(ChannelHandlerContext channelHandlerContext, ByteBuf byteBuf);
+    protected abstract void handleData(ChannelHandlerContext channelHandlerContext, Object msg);
 
     @Override
     public void userEventTriggered(ChannelHandlerContext ctx, Object evt) throws Exception {
