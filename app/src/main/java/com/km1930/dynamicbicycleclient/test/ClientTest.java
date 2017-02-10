@@ -1,46 +1,37 @@
-package com.km1930.dynamicbicycleclient;
+package com.km1930.dynamicbicycleclient.test;
 
 import android.util.Log;
 
 import com.km1930.dynamicbicycleclient.client.Client;
 import com.km1930.dynamicbicycleclient.model.IntelDevice;
 
-import org.junit.Test;
-
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import static org.junit.Assert.*;
-
 /**
- * Example local unit test, which will execute on the development machine (host).
- *
- * @see <a href="http://d.android.com/tools/testing">Testing documentation</a>
+ * Description:
+ * Author:Giousa
+ * Date:2017/2/10
+ * Email:65489469@qq.com
  */
-public class ExampleUnitTest {
+public class ClientTest {
 
-    private Timer mTimer = null;
-    private TimerTask mTimerTask = null;
-    private boolean isPause = false;
+    private static Timer mTimer = null;
+    private static TimerTask mTimerTask = null;
+    private static boolean isPause = false;
     private static int delay = 5000;
     private static int period = 5000;
-    private Client mClient;
+    private static Client mClient;
 
-    @Test
-    public void addition_isCorrect() throws Exception {
-        assertEquals(4, 2 + 2);
-    }
-
-    @Test
-    public void startClient() throws Exception{
+    public static void main(String[] args) {
         mClient = new Client("127.0.0.1");
         mClient.start();
         startTimer();
     }
 
-    private void startTimer(){
+    private static void startTimer(){
         if (mTimer == null) {
             mTimer = new Timer();
         }
@@ -49,11 +40,9 @@ public class ExampleUnitTest {
             mTimerTask = new TimerTask() {
                 @Override
                 public void run() {
-                    Log.d("UnitTest","timer start");
                     sendToServer();
                     do {
                         try {
-                            Log.i("UnitTest", "sleep(5000)...");
                             Thread.sleep(delay);
                         } catch (InterruptedException e) {
                         }
@@ -68,8 +57,8 @@ public class ExampleUnitTest {
 
     }
 
-    private int speed = 0;
-    private void sendToServer(){
+    private static int speed = 0;
+    private static void sendToServer(){
         if(speed > 1000){
             speed = 0;
         }
@@ -88,22 +77,6 @@ public class ExampleUnitTest {
         } catch (Exception e) {
             e.printStackTrace();
         }
-    }
-
-    private void stopTimer(){
-
-        Log.d("UnitTest","timer end");
-
-        if(mTimer!=null){
-            mTimer.cancel();
-            mTimer = null;
-        }
-
-        if(mTimerTask != null){
-            mTimerTask.cancel();
-            mTimerTask = null;
-        }
-
     }
 
 }

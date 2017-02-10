@@ -227,6 +227,14 @@ public class TService extends Service implements SerialManager.SerialSpeedChange
         byte[] bytes = new IntelDevice.Builder().deviceId(mDeviceId).speed(speed++).build().encode();
         System.out.println("bytes speed="+ Arrays.toString(bytes));
         try {
+            IntelDevice intelDevice = IntelDevice.ADAPTER.decode(bytes);
+            System.out.println("IntelDevice:"+intelDevice);
+            System.out.println("IntelDevice  deviceId:"+intelDevice.deviceId);
+            System.out.println("IntelDevice  speed:"+intelDevice.speed);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        try {
             mClient.sendData(Arrays.toString(bytes));
         } catch (Exception e) {
             e.printStackTrace();
