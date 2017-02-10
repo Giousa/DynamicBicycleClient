@@ -23,9 +23,9 @@ public class ClientTest {
     private static Client mClient;
 
     public static void main(String[] args) {
-        mClient = new Client("127.0.0.1");
+        mClient = new Client();
         mClient.start();
-        startTimer();
+//        startTimer();
     }
 
     private static void startTimer(){
