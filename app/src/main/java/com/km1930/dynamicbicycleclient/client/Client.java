@@ -123,7 +123,7 @@ public class Client {
                             achieveHostIP();
                             doConnect();
                         }
-                    }, 10, TimeUnit.SECONDS);
+                    }, 2, TimeUnit.SECONDS);
                 }
             }
         });

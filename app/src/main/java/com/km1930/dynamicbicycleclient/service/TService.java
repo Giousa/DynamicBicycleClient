@@ -22,7 +22,7 @@ public class TService extends Service implements SerialManager.SerialValueChange
     private static final String TAG = TService.class.getSimpleName();
     private SerialManager mSerialManager;
     private Client mClient;
-    private int mSeatId = 1;
+    private int mSeatId = 3;
 
     @Nullable
     @Override
