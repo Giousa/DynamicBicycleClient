@@ -6,6 +6,7 @@ import com.km1930.dynamicbicycleclient.code.MsgPackDecode;
 import com.km1930.dynamicbicycleclient.code.MsgPackEncode;
 import com.km1930.dynamicbicycleclient.handler.ClientHandler;
 import com.km1930.dynamicbicycleclient.model.DeviceValue;
+import com.km1930.dynamicbicycleclient.model.TypeData;
 import com.km1930.dynamicbicycleclient.utils.SharedPreferencesUtil;
 import com.km1930.dynamicbicycleclient.utils.UIUtils;
 
@@ -19,6 +20,7 @@ import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelFutureListener;
+import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelPipeline;
 import io.netty.channel.nio.NioEventLoopGroup;
@@ -39,8 +41,17 @@ public class Client {
     private Bootstrap bootstrap;
     private String hostIp = "127.0.0.1";
     private final static String SP_NAME = "CONFIG_IP";
+    private ChannelChangeListener mChannelChangeListener;
 
     public Client() {
+    }
+
+    public interface ChannelChangeListener{
+        void onChannelChangeListener(int resistance);
+    }
+
+    public void setChannelChangeListener(ChannelChangeListener channelChangeListener) {
+        mChannelChangeListener = channelChangeListener;
     }
 
     public void sendData(DeviceValue deviceValue) throws Exception {
@@ -51,6 +62,13 @@ public class Client {
     }
 
     public void start() {
+
+        //TODO 在设备上运行时，打开
+        String string = SharedPreferencesUtil.getString(UIUtils.getContext(), SP_NAME, "");
+        if(string != null && !string.equals("")){
+            hostIp = string;
+        }
+
         try {
             bootstrap = new Bootstrap();
             bootstrap
@@ -59,10 +77,20 @@ public class Client {
                     .handler(new ChannelInitializer<SocketChannel>() {
                         protected void initChannel(SocketChannel socketChannel) throws Exception {
                             ChannelPipeline p = socketChannel.pipeline();
+                            ClientHandler clientHandler = new ClientHandler(Client.this);
                             p.addLast(new IdleStateHandler(0, 0, 5));
                             p.addLast(new MsgPackDecode());
                             p.addLast(new MsgPackEncode());
-                            p.addLast(new ClientHandler(Client.this));
+                            p.addLast(clientHandler);
+                            clientHandler.setChannelValueChangeListener(new ClientHandler.ChannelValueChangeListener() {
+                                @Override
+                                public void onChannelValueChangeListener(int resistance) {
+                                    System.out.println("client resistance = "+resistance);
+                                    if(mChannelChangeListener != null){
+                                        mChannelChangeListener.onChannelChangeListener(resistance);
+                                    }
+                                }
+                            });
                         }
                     });
             doConnect();
@@ -77,12 +105,10 @@ public class Client {
             return;
         }
 
-        String string = SharedPreferencesUtil.getString(UIUtils.getContext(), SP_NAME, "");
-        if(string != null){
-            hostIp = string;
-        }
-
+        System.out.println("here  hostIp="+hostIp);
         ChannelFuture future = bootstrap.connect(hostIp, 12345);
+//        ChannelFuture future = bootstrap.connect("127.0.0.1", 12345);
+//        ChannelFuture future = bootstrap.connect("192.168.0.109", 12345);
 
         future.addListener(new ChannelFutureListener() {
             public void operationComplete(ChannelFuture futureListener) throws Exception {
@@ -91,10 +117,10 @@ public class Client {
                     System.out.println("Connect to server successfully!");
                 } else {
                     System.out.println("Failed to connect to server, try connect after 10s");
-                    achieveHostIP();
                     futureListener.channel().eventLoop().schedule(new Runnable() {
                         @Override
                         public void run() {
+                            achieveHostIP();
                             doConnect();
                         }
                     }, 10, TimeUnit.SECONDS);
@@ -129,10 +155,10 @@ public class Client {
                     if(sbuf != null){
                         String mConfigServerIP = sbuf.toString();
                         System.out.println("收到广播: "+mConfigServerIP);
+                        hostIp = mConfigServerIP;
                         if(!mConfigServerIP.equals(hostIp) && !mConfigServerIP.isEmpty()){
                             SharedPreferencesUtil.saveString(UIUtils.getContext(),SP_NAME,mConfigServerIP);
                         }
-                        hostIp = mConfigServerIP;
                     }
 
                 } catch (SocketException e) {

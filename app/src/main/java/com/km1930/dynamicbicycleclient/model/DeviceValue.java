@@ -13,7 +13,7 @@ public class DeviceValue {
 
     private int type;
 
-    private String deviceName;
+    private int seatId;
 
     private int speed;
 
@@ -27,12 +27,12 @@ public class DeviceValue {
         this.type = type;
     }
 
-    public String getDeviceName() {
-        return deviceName;
+    public int getSeatId() {
+        return seatId;
     }
 
-    public void setDeviceName(String deviceName) {
-        this.deviceName = deviceName;
+    public void setSeatId(int seatId) {
+        this.seatId = seatId;
     }
 
     public int getSpeed() {

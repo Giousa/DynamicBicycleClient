@@ -29,31 +29,27 @@ public class SerialManager {
 
     }
 
-    public interface SerialSpeedChangeListener {
-        void onSerialSpeedChanged(int speed);
+    public interface SerialValueChangeListener{
+        void onSerialValueChangeListener(int speed, int angle) throws Exception;
     }
 
-    public interface SerialAngleChangeListener {
-        void onSerialAngleChanged(int angle);
-    }
+    private SerialValueChangeListener mSerialValueChangeListener;
 
-    private SerialSpeedChangeListener mSerialSpeedChangeListener;
-    private SerialAngleChangeListener mSerialAngleChangeListener;
-
-    public void setSerialSpeedChangeListener(SerialSpeedChangeListener serialSpeedChangeListener) {
-        mSerialSpeedChangeListener = serialSpeedChangeListener;
-    }
-
-    public void setSerialAngleChangeListener(SerialAngleChangeListener serialAngleChangeListener) {
-        mSerialAngleChangeListener = serialAngleChangeListener;
+    public void setSerialValueChangeListener(SerialValueChangeListener serialValueChangeListener) {
+        mSerialValueChangeListener = serialValueChangeListener;
     }
 
     private Handler mHandler = new Handler();
     private Runnable mTimerRunnable = new Runnable() {
         @Override
         public void run() {
-            readSerial();
-            mHandler.postDelayed(mTimerRunnable, 200);
+            try {
+                readSerial();
+                mHandler.postDelayed(mTimerRunnable, 200);
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
     };
 
@@ -74,7 +70,7 @@ public class SerialManager {
         Serial.SetSerialBaud(baud);
     }
 
-    public void readSerial() {
+    public void readSerial() throws Exception {
 
         short[] mShorts = new short[9];
 
@@ -82,35 +78,27 @@ public class SerialManager {
         Log.d(TAG, "serialBuf:" + serialBuf);
 
         if(serialBuf == 9){
-//            if(mShorts[0] == 0x55 && mShorts[1] == 0x01 && mShorts[8] == 0xAA){
-//                parseSerialData(mShorts);
-//            }
             parseSerialData(mShorts);
-
         }
     }
 
     private int mSpeed = 0;
     private int mAngle = 15;
 
-    private void parseSerialData(short[] mShorts) {
+    private void parseSerialData(short[] mShorts) throws Exception {
 
         int speed = mShorts[2];
         speed = (Math.round(speed*100))/100;
         Log.d(TAG,"serialmanager speed="+speed);
 
-        if (mSpeed != speed) {
-            mSpeed = speed;
-            if(mSerialSpeedChangeListener != null){
-                mSerialSpeedChangeListener.onSerialSpeedChanged(mSpeed);
-            }
-        }
-
         int angle = mShorts[3];
-        if(mAngle != angle){
+
+        if (mSpeed != speed || mAngle != angle) {
+            mSpeed = speed;
             mAngle = angle;
-            if(mSerialAngleChangeListener != null){
-                mSerialAngleChangeListener.onSerialAngleChanged(mAngle);
+
+            if(mSerialValueChangeListener != null){
+                mSerialValueChangeListener.onSerialValueChangeListener(mSpeed,mAngle);
             }
         }
 

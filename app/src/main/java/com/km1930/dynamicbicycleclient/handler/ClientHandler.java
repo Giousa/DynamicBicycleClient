@@ -2,6 +2,9 @@ package com.km1930.dynamicbicycleclient.handler;
 
 import com.km1930.dynamicbicycleclient.client.Client;
 import com.km1930.dynamicbicycleclient.common.CustomHeartbeatHandler;
+import com.km1930.dynamicbicycleclient.model.DeviceValue;
+
+import java.util.List;
 
 import io.netty.channel.ChannelHandlerContext;
 
@@ -18,10 +21,26 @@ public class ClientHandler extends CustomHeartbeatHandler {
         this.client = client;
     }
 
+    public interface ChannelValueChangeListener{
+        void onChannelValueChangeListener(int resistance);
+    }
+
+    private ChannelValueChangeListener mChannelValueChangeListener;
+
+    public void setChannelValueChangeListener(ChannelValueChangeListener channelValueChangeListener) {
+        mChannelValueChangeListener = channelValueChangeListener;
+    }
 
     @Override
     protected void handleData(ChannelHandlerContext channelHandlerContext, Object msg) {
         System.out.println(name+"  handleData:"+msg);
+        List<DeviceValue> deviceValues = (List<DeviceValue>) msg;
+        int resistance = Integer.parseInt(String.valueOf(deviceValues.get(2)));
+        System.out.println("resistance = "+resistance);
+        if(mChannelValueChangeListener != null){
+            mChannelValueChangeListener.onChannelValueChangeListener(resistance);
+        }
+
     }
 
     @Override

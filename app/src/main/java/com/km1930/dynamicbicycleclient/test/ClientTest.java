@@ -25,7 +25,7 @@ public class ClientTest {
     public static void main(String[] args) {
         mClient = new Client();
         mClient.start();
-//        startTimer();
+        startTimer();
     }
 
     private static void startTimer(){
@@ -60,7 +60,7 @@ public class ClientTest {
         s.setType(TypeData.CUSTOME);
         s.setSpeed(speed++);
         s.setAngle(15);
-        s.setDeviceName("UT01");
+        s.setSeatId(1);
         try {
             mClient.sendData(s);
         } catch (Exception e) {

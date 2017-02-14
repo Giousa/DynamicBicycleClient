@@ -27,23 +27,22 @@ public abstract class CustomHeartbeatHandler extends ChannelInboundHandlerAdapte
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
         List<DeviceValue> s = (List<DeviceValue>) msg;
-        System.out.println("type="+s.get(0));
-        if ("1".equals(s.get(0))) {
+        System.out.println("CustomHeartbeatHandler type="+s.get(3));
+        if ("1".equals(s.get(3))) {
             sendPongMsg(ctx);
-        } else if ("2".equals(s.get(0))){
+        } else if ("2".equals(s.get(3))){
             System.out.println(name + " get pong msg from " + ctx.channel().remoteAddress());
         } else {
             handleData(ctx, msg);
         }
     }
 
-
     protected void sendPingMsg(ChannelHandlerContext context) {
         DeviceValue s = new DeviceValue();
         s.setType(TypeData.PING);
         s.setSpeed(0);
         s.setAngle(15);
-        s.setDeviceName("ping");
+        s.setSeatId(100);
         context.channel().writeAndFlush(s);
         heartbeatCount++;
         System.out.println(name + " sent ping msg to " + context.channel().remoteAddress() + ", count: " + heartbeatCount);
@@ -54,7 +53,7 @@ public abstract class CustomHeartbeatHandler extends ChannelInboundHandlerAdapte
         s.setType(TypeData.PONG);
         s.setSpeed(0);
         s.setAngle(15);
-        s.setDeviceName("pong");
+        s.setSeatId(101);
         context.channel().writeAndFlush(s);
         heartbeatCount++;
         System.out.println(name + " sent pong msg to " + context.channel().remoteAddress() + ", count: " + heartbeatCount);
