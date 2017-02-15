@@ -3,6 +3,7 @@ package com.km1930.dynamicbicycleclient.handler;
 import com.km1930.dynamicbicycleclient.client.Client;
 import com.km1930.dynamicbicycleclient.common.CustomHeartbeatHandler;
 import com.km1930.dynamicbicycleclient.model.DeviceValue;
+import com.km1930.dynamicbicycleclient.model.TypeData;
 
 import java.util.List;
 
@@ -37,10 +38,13 @@ public class ClientHandler extends CustomHeartbeatHandler {
         List<DeviceValue> deviceValues = (List<DeviceValue>) msg;
         int resistance = Integer.parseInt(String.valueOf(deviceValues.get(2)));
         System.out.println("resistance = "+resistance);
-        if(mChannelValueChangeListener != null){
-            mChannelValueChangeListener.onChannelValueChangeListener(resistance);
+        int seat = Integer.parseInt(String.valueOf(deviceValues.get(1)));
+        System.out.println("seat = "+seat);
+        if(seat == TypeData.SERVER_RESISTANT){
+            if(mChannelValueChangeListener != null){
+                mChannelValueChangeListener.onChannelValueChangeListener(resistance);
+            }
         }
-
     }
 
     @Override
